@@ -1,5 +1,442 @@
-<html>
-  <body>
-  first github web page. 
-  </body>
-<html>
+  <!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>今日は何があった？ - 和の歴史回廊</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Shippori+Mincho+B1&display=swap" rel="stylesheet">
+  <style>
+    /* 既存のCSSスタイルは変更なし */
+    :root {
+      --bg-main: #fdfaf5;
+      --text-main: #333;
+      --accent: #b03a2e;
+      --header-overlay: rgba(0, 0, 0, 0.5);
+    }
+    body.dark-mode {
+      --bg-main: #1e1e1e;
+      --text-main: #eee;
+      --accent: #ff6347;
+      --header-overlay: rgba(0, 0, 0, 0.6);
+    }
+    body {
+      margin: 0;
+      font-family: 'Noto Serif JP', serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      transition: background-color 0.3s, color 0.3s;
+    }
+    header.hero {
+      background-size: cover;
+      background-position: center;
+      height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      text-align: center;
+    }
+    header.hero .overlay {
+      position: absolute;
+      width: 100%; height: 100%;
+      background: var(--header-overlay);
+    }
+    header.hero .hero-content {
+      position: relative;
+      color: #fff;
+      z-index: 1;
+    }
+    header.hero h1 {
+      font-family: 'Shippori Mincho B1', serif;
+      font-size: 3em;
+      margin: 0;
+    }
+    header.hero p {
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .section-title {
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      border-left: 5px solid var(--accent);
+      padding-left: 10px;
+      color: var(--accent);
+    }
+    .history-description p {
+      margin-bottom: 1.5em;
+      line-height: 1.8;
+    }
+    #resultList li {
+      background-color: rgba(245, 242, 236, 0.9);
+      padding: 15px;
+      margin-bottom: 12px;
+      border-left: 4px solid #888;
+      border-radius: 4px;
+    }
+    body.dark-mode #resultList li {
+      background-color: #2a2a2a;
+    }
+    #resultList img {
+      max-width: 200px;
+      margin-top: 10px;
+      border-radius: 4px;
+    }
+    footer {
+      text-align: center;
+      background: #eae4dc;
+      padding: 20px;
+      font-size: 0.9em;
+    }
+    body.dark-mode footer {
+      background: #2b2b2b;
+    }
+    button, input[type="date"], input[type="text"] { /* input[type="text"] を追加 */
+      font-size: 1em;
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid #aaa;
+      margin-top: 10px;
+    }
+    button {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #922b21;
+    }
+    #themeToggle {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 6px 12px;
+      z-index: 999;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* ここから追加するCSSスタイル */
+    .filter-options button {
+      margin-right: 10px;
+      padding: 8px 15px;
+      background-color: #ccc;
+      color: #333;
+      border: 1px solid #999;
+    }
+    .filter-options button.active {
+      background-color: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    #dailyPerson, #triviaSection {
+      background-color: rgba(245, 242, 236, 0.7);
+      padding: 20px;
+      margin-top: 40px;
+      border-radius: 8px;
+    }
+    body.dark-mode #dailyPerson, body.dark-mode #triviaSection {
+      background-color: #2a2a2a;
+    }
+    #dailyPerson h3, #triviaSection h3 {
+      color: var(--accent);
+      margin-top: 0;
+    }
+    #dailyPerson p, #triviaSection p {
+      line-height: 1.6;
+    }
+    #dailyPerson img {
+      max-width: 150px;
+      height: auto;
+      border-radius: 50%; /* 丸い画像 */
+      float: right; /* テキストの右に配置 */
+      margin-left: 20px;
+      margin-bottom: 10px;
+    }
+    #searchResultList li {
+      background-color: rgba(245, 242, 236, 0.9);
+      padding: 15px;
+      margin-bottom: 12px;
+      border-left: 4px solid #b03a2e; /* 検索結果は強調 */
+      border-radius: 4px;
+    }
+    body.dark-mode #searchResultList li {
+      background-color: #2a2a2a;
+    }
+  </style>
+</head>
+<body>
+  <button id="themeToggle">🌙 ダークモード</button>
+  <header class="hero" id="hero">
+    <div class="overlay"></div>
+    <div class="hero-content">
+      <h1>今日は何があった？</h1>
+      <p>悠久の歴史を旅しよう</p>
+    </div>
+  </header>
+
+  <div class="container">
+    <section class="history-description">
+      <h2 class="section-title">歴史とは何か</h2>
+      <p>歴史とは、単に過去の出来事を記録したものではありません。それは人々の選択、文化、技術、信念の積み重ねが織りなす壮大な物語です。歴史を学ぶことは、今を見つめ直し、未来を描く力となります。</p>
+      <p>古代文明の興隆、中世の宗教改革、産業革命、そして現代のグローバル社会の形成。あらゆる時代に人類は挑戦し、葛藤し、前進してきました。その痕跡が今を支える基盤となっているのです。</p>
+      <p>このサイトでは、特定の日付に起こった重要な歴史的出来事を通じて、過去と現在のつながりを感じていただけることを願っています。</p>
+    </section>
+
+    <section id="dailyPerson">
+      <h2 class="section-title">今日の人物</h2>
+      <div id="dailyPersonContent">
+        <p>読み込み中...</p>
+      </div>
+    </section>
+
+    <section id="triviaSection">
+      <h2 class="section-title">歴史の豆知識</h2>
+      <div id="triviaContent">
+        <p>読み込み中...</p>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">日付を選んで出来事を表示</h2>
+      <input type="date" id="dateInput">
+      <button onclick="getEvents()">取得</button>
+
+      <div class="filter-options" style="margin-top: 15px;">
+        <button data-filter="all" class="active">全て</button>
+        <button data-filter="events">出来事</button>
+        <button data-filter="births">誕生日</button>
+        <button data-filter="deaths">命日</button>
+      </div>
+      <ul id="resultList"></ul>
+    </section>
+
+    <section>
+      <h2 class="section-title">キーワードで歴史を検索</h2>
+      <input type="text" id="searchInput" placeholder="キーワードを入力してください">
+      <button onclick="searchHistory()">検索</button>
+      <ul id="searchResultList"></ul>
+    </section>
+
+  </div>
+
+  <footer>
+    &copy; 2025 和の歴史回廊 | 出典：Wikipedia API | 写真：Pixabay
+  </footer>
+
+  <script>
+    // 既存のJavaScriptコードは変更なし
+    const heroImages = [
+      'https://cdn.pixabay.com/photo/2017/08/06/22/01/japanese-garden-2599983_1280.jpg',
+      'https://cdn.pixabay.com/photo/2016/08/11/18/06/shrine-1585655_1280.jpg',
+      'https://cdn.pixabay.com/photo/2020/01/12/11/35/temple-4758959_1280.jpg'
+    ];
+    let currentImageIndex = 0;
+
+    function rotateHeroImage() {
+      const hero = document.getElementById('hero');
+      hero.style.backgroundImage = `url('${heroImages[currentImageIndex]}')`;
+      currentImageIndex = (currentImageIndex + 1) % heroImages.length;
+    }
+    rotateHeroImage();
+    setInterval(rotateHeroImage, 10000);
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+
+    let currentEventsData = null; // フィルター用
+    let currentFilter = 'all'; // 現在のフィルター状態
+
+    // 日付指定による出来事取得（変更あり：フィルター機能追加）
+    async function getEvents() {
+      const dateInput = document.getElementById('dateInput');
+      const date = new Date(dateInput.value);
+      if (isNaN(date.getTime())) { // 無効な日付の場合
+        document.getElementById('resultList').innerHTML = '<li>有効な日付を選択してください。</li>';
+        return;
+      }
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const url = `https://api.wikimedia.org/feed/v1/wikipedia/ja/onthisday/all/${month}/${day}`;
+
+      try {
+        document.getElementById('resultList').innerHTML = '<li>読み込み中...</li>';
+        const response = await fetch(url, {
+          headers: {
+            'User-Agent': 'HistoricalWebApp (example@example.com)'
+          }
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        currentEventsData = data; // データを保存
+        displayEvents(currentEventsData, currentFilter); // フィルターを適用して表示
+
+        // 日付が選択されたら、今日の人物と豆知識も更新
+        displayDailyPersonAndTrivia(data);
+
+      } catch (error) {
+        console.error('データ取得エラー:', error);
+        document.getElementById('resultList').innerHTML = '<li>データ取得に失敗しました。</li>';
+        currentEventsData = null;
+      }
+    }
+
+    // 出来事を表示する関数（新規追加）
+    function displayEvents(data, filterType) {
+      const resultList = document.getElementById('resultList');
+      resultList.innerHTML = '';
+
+      let filteredEvents = [];
+      if (filterType === 'all') {
+        filteredEvents = [...data.events, ...data.births, ...data.deaths];
+      } else {
+        filteredEvents = data[filterType] || [];
+      }
+
+      if (filteredEvents.length === 0) {
+        resultList.innerHTML = '<li>このフィルター条件では出来事が見つかりませんでした。</li>';
+        return;
+      }
+
+      filteredEvents.sort((a, b) => a.year - b.year); // 年代順にソート
+
+      filteredEvents.forEach(item => {
+        const li = document.createElement('li');
+        let typeText = '';
+        if (data.events.includes(item)) typeText = '【出来事】';
+        else if (data.births.includes(item)) typeText = '【誕生日】';
+        else if (data.deaths.includes(item)) typeText = '【命日】';
+
+        li.innerHTML = `<strong>${item.year}年:</strong> ${typeText} ${item.text}`;
+
+        if (item.pages && item.pages[0].thumbnail && item.pages[0].thumbnail.source) {
+          const img = document.createElement('img');
+          img.src = item.pages[0].thumbnail.source;
+          img.alt = item.pages[0].title;
+          li.appendChild(img);
+        }
+        resultList.appendChild(li);
+      });
+    }
+
+    // フィルターボタンのイベントリスナー（新規追加）
+    document.querySelectorAll('.filter-options button').forEach(button => {
+      button.addEventListener('click', function() {
+        // 全てのボタンからactiveクラスを削除
+        document.querySelectorAll('.filter-options button').forEach(btn => btn.classList.remove('active'));
+        // クリックされたボタンにactiveクラスを追加
+        this.classList.add('active');
+
+        currentFilter = this.dataset.filter;
+        if (currentEventsData) {
+          displayEvents(currentEventsData, currentFilter);
+        } else {
+          document.getElementById('resultList').innerHTML = '<li>日付を選択して出来事を読み込んでください。</li>';
+        }
+      });
+    });
+
+    // 今日の人物と豆知識を表示する関数（新規追加）
+    function displayDailyPersonAndTrivia(data) {
+      const dailyPersonContent = document.getElementById('dailyPersonContent');
+      const triviaContent = document.getElementById('triviaContent');
+      dailyPersonContent.innerHTML = '';
+      triviaContent.innerHTML = '';
+
+      // 今日の人物 (誕生日、命日の著名人からランダムに1人選定)
+      const notablePeople = [...data.births, ...data.deaths].filter(item => item.pages && item.pages[0].description);
+      if (notablePeople.length > 0) {
+        const person = notablePeople[Math.floor(Math.random() * notablePeople.length)];
+        let description = person.pages[0].extract || person.pages[0].description || '説明が見つかりませんでした。';
+        // 抽出が長すぎる場合、最初の数文に短縮
+        if (description.length > 300) {
+            description = description.substring(0, description.indexOf('.', 200) + 1 || 300) + '...';
+        }
+
+        dailyPersonContent.innerHTML = `
+          ${person.pages[0].thumbnail ? `<img src="${person.pages[0].thumbnail.source}" alt="${person.pages[0].title}">` : ''}
+          <h3>${person.pages[0].title} (${person.year}年 ${data.births.includes(person) ? '誕生' : '死去'})</h3>
+          <p>${description} <a href="https://ja.wikipedia.org/wiki/${encodeURIComponent(person.pages[0].title)}" target="_blank" rel="noopener noreferrer">もっと読む</a></p>
+        `;
+      } else {
+        dailyPersonContent.innerHTML = '<p>この日の著名な人物は見つかりませんでした。</p>';
+      }
+
+      // 歴史の豆知識 (出来事からランダムに1つ選定)
+      if (data.events.length > 0) {
+        const trivia = data.events[Math.floor(Math.random() * data.events.length)];
+        triviaContent.innerHTML = `
+          <h3>${trivia.year}年の出来事から</h3>
+          <p>${trivia.text} <a href="https://ja.wikipedia.org/wiki/${encodeURIComponent(trivia.pages[0].title || trivia.text.split(' ')[0])}" target="_blank" rel="noopener noreferrer">詳細</a></p>
+        `;
+      } else {
+        triviaContent.innerHTML = '<p>この日の豆知識は見つかりませんでした。</p>';
+      }
+    }
+
+
+    // キーワード検索機能（新規追加）
+    async function searchHistory() {
+      const searchTerm = document.getElementById('searchInput').value.trim();
+      const searchResultList = document.getElementById('searchResultList');
+      searchResultList.innerHTML = '';
+
+      if (!searchTerm) {
+        searchResultList.innerHTML = '<li>検索キーワードを入力してください。</li>';
+        return;
+      }
+
+      // Wikipedia APIの検索エンドポイントを使用
+      const url = `https://ja.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchTerm)}&format=json&origin=*`;
+
+      try {
+        searchResultList.innerHTML = '<li>検索中...</li>';
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+
+        if (data.query.search.length === 0) {
+          searchResultList.innerHTML = '<li>該当する項目は見つかりませんでした。</li>';
+          return;
+        }
+
+        data.query.search.forEach(item => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <a href="https://ja.wikipedia.org/wiki/${encodeURIComponent(item.title)}" target="_blank" rel="noopener noreferrer">
+              <strong>${item.title}</strong>
+            </a>
+            <p>${item.snippet}...</p>
+            <p style="font-size: 0.8em; color: #666;">（最終更新日: ${new Date(item.timestamp).toLocaleDateString('ja-JP')})</p>
+          `;
+          searchResultList.appendChild(li);
+        });
+
+      } catch (error) {
+        console.error('検索データ取得エラー:', error);
+        searchResultList.innerHTML = '<li>検索データの取得に失敗しました。</li>';
+      }
+    }
+
+    // ページロード時に今日の出来事を自動表示
+    window.onload = () => {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      document.getElementById('dateInput').value = `${year}-${month}-${day}`;
+      getEvents(); // 今日の出来事を自動的に取得
+    };
+
+  </script>
+</body>
+</html>
